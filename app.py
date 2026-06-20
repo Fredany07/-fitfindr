@@ -32,25 +32,46 @@ def handle_query(user_query: str, wardrobe_choice: str) -> tuple[str, str, str]:
         A tuple of three strings:
             (listing_text, outfit_suggestion, fit_card)
         Each string maps to one of the three output panels in the UI.
-
-    TODO:
-        1. Guard against an empty query (return early with an error message).
-        2. Select the wardrobe based on wardrobe_choice.
-        3. Call run_agent() with the query and selected wardrobe.
-        4. If session["error"] is set, return the error in the first panel
-           and empty strings for the other two.
-        5. Otherwise, format session["selected_item"] into a readable listing_text
-           string and return it along with session["outfit_suggestion"] and
-           session["fit_card"].
     """
-    # TODO: implement this function
-    return "Agent not yet implemented.", "", ""
+
+    # Step 1: Guard against empty query
+    if not user_query or not user_query.strip():
+        return "Please enter a search query to get started.", "", ""
+
+    # Step 2: Select wardrobe based on user choice
+    if wardrobe_choice == "Example wardrobe":
+        wardrobe = get_example_wardrobe()
+    else:
+        wardrobe = get_empty_wardrobe()
+
+    # Step 3: Run the agent
+    session = run_agent(user_query.strip(), wardrobe)
+
+    # Step 4: If there was an error, return it in the first panel
+    if session["error"]:
+        return session["error"], "", ""
+
+    # Step 5: Format the selected item into a readable listing text
+    item = session["selected_item"]
+    listing_text = (
+        f"Title:      {item.get('title', 'N/A')}\n"
+        f"Price:      ${item.get('price', 'N/A')}\n"
+        f"Platform:   {item.get('platform', 'N/A')}\n"
+        f"Size:       {item.get('size', 'N/A')}\n"
+        f"Condition:  {item.get('condition', 'N/A')}\n"
+        f"Category:   {item.get('category', 'N/A')}\n"
+        f"Colors:     {', '.join(item.get('colors', []))}\n"
+        f"Style tags: {', '.join(item.get('style_tags', []))}\n"
+        f"Brand:      {item.get('brand') or 'Unbranded'}\n"
+    )
+
+    return listing_text, session["outfit_suggestion"], session["fit_card"]
 
 
 # ── interface ─────────────────────────────────────────────────────────────────
 
 EXAMPLE_QUERIES = [
-    "vintage graphic tee under $30",
+    "vintage tee under $30",
     "90s track jacket in size M",
     "flowy midi skirt under $40",
     "black combat boots size 8",
@@ -68,7 +89,7 @@ Describe what you're looking for — include size and price if you want to filte
         with gr.Row():
             query_input = gr.Textbox(
                 label="What are you looking for?",
-                placeholder="e.g. vintage graphic tee under $30, size M",
+                placeholder="e.g. vintage tee under $30, size M",
                 lines=2,
                 scale=3,
             )

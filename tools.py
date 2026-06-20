@@ -92,7 +92,7 @@ def search_listings(
 
     # Step 5: Sort by score descending and return just the dicts
     scored.sort(key=lambda x: x[1], reverse=True)
-    print("DEBUG scored:", len(scored))
+
     return [item for item, _ in scored]
 
 
