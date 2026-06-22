@@ -184,3 +184,4 @@ I provided Claude with the Tool 1 block from planning.md (inputs, return value, 
 
 **Instance 2 — Implementing the planning loop:**
 I provided Claude with the Planning Loop, State Management, and Architecture sections of planning.md — including the full ASCII diagram — and asked it to implement `run_agent()`. The generated code matched the spec closely, but initially called all three tools unconditionally regardless of whether `search_listings` returned results. I revised the early-return branch to check `if not results` and return the session immediately, which is what the diagram specified.
+This is important
